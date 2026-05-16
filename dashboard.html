@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><title>WC Show Game - Live Dashboard</title>
+<style>
+body{font-family:system-ui;background:#0f172a;color:#e2e8f0;margin:0;padding:20px}
+.container{max-width:1400px;margin:0 auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:20px;margin:20px 0}
+.card{background:#1e293b;padding:20px;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}
+h1{text-align:center;color:#38bdf8}
+.stat{font-size:2.5em;font-weight:bold;color:#10b981}
+table{width:100%;border-collapse:collapse}
+table th,td{padding:10px;text-align:left}
+table tr:nth-child(even){background:#334155}
+.news{max-height:300px;overflow-y:auto}
+.chat{display:flex;flex-direction:column;gap:8px}
+.msg{background:#334155;padding:8px;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🏆 WC Show Game - Live</h1>
+<div class="grid">
+<div class="card"><h3>💰 Финансы</h3><p>Участников: <span class="stat" id="players">0</span></p><p>Оплатили: <span id="paid">0</span></p><p>Сумма: <span id="total">‰</span> ₽</p></div>
+<div class="card"><h3>⚽ Прогнозы</h3><p>Матчей: <span id="matches">0</span></p><p>Прогнозов: <span id="predictions">0</span></p></div>
+<div class="card"><h3>📊 ТОП-5</h3><div id="leaderboard"></div></div>
+</div>
+<div class="grid">
+<div class="card"><h3>📰 Новости</h3><div class="news" id="news"></div></div>
+<div class="card"><h3>💬 Чат</h3><div class="chat" id="chat"></div></div>
+</div>
+</div>
+<script>
+const ws=new WebSocket('ws://'+location.host+'/ws');
+ws.onmessage=e=>{const d=JSON.parse(e.data);document.getElementById('players').textContent=d.players||0;document.getElementById('paid').textContent=d.paid||0;document.getElementById('total').textContent=d.total||0;document.getElementById('matches').textContent=d.matches||0;document.getElementById('predictions').textContent=d.predictions||0;document.getElementById('leaderboard').innerHTML=d.top5?d.top5.map((u,i)=>`<p>${i+1}. ${u.nickname}: ${u.points}</p>`).join(''):'';document.getElementById('news').innerHTML=d.news?d.news.map(n=>`<div>${n.emoji} ${n.text}</div>`).join(''):'';document.getElementById('chat').innerHTML=d.chat?d.chat.map(m=>`<div class="msg"><b>${m.nickname}:</b> ${m.text}</div>`).join(''):'';};
+</script>
+</body>
+</html>
